@@ -1,0 +1,19 @@
+# actakit — Dependencias Python
+# Instalación: pip install -r requirements.txt
+#
+# NOTA: Este archivo lista las dependencias de runtime.
+# Las dependencias de desarrollo (testing, linting) no están incluidas.
+#
+# Dependencias del sistema (requeridas por los scripts):
+#   poppler-utils  (Linux: apt install poppler-utils | macOS: brew install poppler)
+#
+# Licencia de dependencias:
+#   pyyaml:        MIT
+#   requests:      Apache 2.0
+#   beautifulsoup4: MIT
+#   python-docx:   MIT
+
+pyyaml==6.0.1
+requests==2.31.0
+beautifulsoup4==4.12.3
+python-docx==1.1.0

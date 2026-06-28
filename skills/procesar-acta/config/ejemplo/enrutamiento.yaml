@@ -1,0 +1,162 @@
+# =============================================================================
+# Tabla de enrutamiento Acta → Hilo — EJEMPLO
+# =============================================================================
+# Reemplazá este archivo con las señales de tu cantón: nombres de lugares,
+# instituciones, rutas, programas, leyes, etc.
+#
+# Matching:
+#   1. Aplicar primero `anti_enrutamientos`.
+#   2. Contar señales de `enrutamiento_principal` (substring case-insensitive).
+#   3. Gana el Hilo con más señales. Empate: gana el primero.
+#   4. Si ningún Hilo acumula señales → `## Propuestas de Hilo nuevo`.
+
+version: 1
+municipio: "Ejemplo"
+hilos_raiz: "hilos"
+
+anti_enrutamientos:
+  - tema: "modificación presupuestaria"
+    va_a: "Presupuesto, Finanzas, Tarifas y Planificación"
+    no_a:
+      - "Concejo Municipal y Funcionamiento"
+
+  - tema: "agua"
+    va_a: "Agua Potable, AyA y ASADAS"
+    no_a:
+      - "Salud Pública, CCSS, EBAIS y Campañas"
+
+  - tema: "licitación de obra vial"
+    va_a: "Contratación, Activos y Mercado Municipal"
+    no_a:
+      - "Movilidad, Red Vial y Transporte Público"
+
+enrutamiento_principal:
+  - bloque: "Gobierno Local y Gobernanza"
+    hilo: "Concejo Municipal y Funcionamiento"
+    señales:
+      - "composición del concejo"
+      - "elección de directorio"
+      - "quórum"
+      - "presidencia"
+      - "vicepresidencia"
+      - "comisiones permanentes"
+      - "reglamento interno"
+      - "asistencia"
+      - "licencias"
+      - "capacitación"
+      - "plan de gobierno"
+
+  - bloque: "Gobierno Local y Gobernanza"
+    hilo: "Proyectos de Ley e Incidencia Legislativa"
+    señales:
+      - "anteproyectos de ley"
+      - "apoyo a expedientes"
+      - "oficios a diputados"
+      - "declaratorias de interés cantonal"
+
+  - bloque: "Finanzas, Control y Activos"
+    hilo: "Presupuesto, Finanzas, Tarifas y Planificación"
+    señales:
+      - "presupuesto ordinario"
+      - "modificaciones presupuestarias"
+      - "liquidaciones"
+      - "estados financieros"
+      - "estudios tarifarios"
+      - "amnistía tributaria"
+      - "beneficios patrimoniales"
+
+  - bloque: "Finanzas, Control y Activos"
+    hilo: "Contratación, Activos y Mercado Municipal"
+    señales:
+      - "licitaciones"
+      - "remates"
+      - "contratos"
+      - "prórrogas"
+      - "concesiones"
+
+  - bloque: "Finanzas, Control y Activos"
+    hilo: "Auditoría y Control Interno"
+    señales:
+      - "auditoría interna"
+      - "control interno"
+      - "caja chica"
+      - "hallazgos de auditoría"
+
+  - bloque: "Movilidad Servicios e Infraestructura"
+    hilo: "Agua Potable, AyA y ASADAS"
+    señales:
+      - "agua potable"
+      - "acueductos"
+      - "asadas"
+      - "fugas"
+      - "cisternas"
+      - "emergencias hídricas"
+      - "pozos"
+
+  - bloque: "Movilidad Servicios e Infraestructura"
+    hilo: "Movilidad, Red Vial y Transporte Público"
+    señales:
+      - "calles"
+      - "caminos"
+      - "puentes"
+      - "junta vial"
+      - "transporte público"
+      - "semáforos"
+      - "accidentalidad vial"
+
+  - bloque: "Territorio, Ambiente y Riesgo"
+    hilo: "Gestión del Riesgo, Emergencias y Aguas Pluviales"
+    señales:
+      - "cne"
+      - "emergencias"
+      - "inundaciones"
+      - "deslizamientos"
+      - "alcantarillado pluvial"
+      - "vulnerabilidad"
+
+  - bloque: "Territorio, Ambiente y Riesgo"
+    hilo: "Ordenamiento Territorial y Plan Regulador"
+    señales:
+      - "plan regulador"
+      - "zonificación"
+      - "catastro"
+      - "permisos de construcción"
+      - "uso de suelo"
+
+  - bloque: "Seguridad Ciudadana"
+    hilo: "Seguridad Ciudadana, Policía Municipal y Convivencia"
+    señales:
+      - "policía municipal"
+      - "fuerza pública"
+      - "cámaras de vigilancia"
+      - "seguridad"
+      - "patrullaje"
+      - "convivencia"
+
+  - bloque: "Educación, Cultura, Deporte y Juventudes"
+    hilo: "Educación, Becas e Infraestructura Educativa"
+    señales:
+      - "juntas de educación"
+      - "escuelas"
+      - "colegios"
+      - "becas"
+      - "transporte estudiantil"
+      - "infraestructura escolar"
+
+  - bloque: "Educación, Cultura, Deporte y Juventudes"
+    hilo: "Deporte y Recreación"
+    señales:
+      - "ligas deportivas"
+      - "asociaciones deportivas"
+      - "comité cantonal de deportes"
+      - "eventos deportivos"
+
+  - bloque: "Salud y Protección Social"
+    hilo: "Salud Pública, CCSS, EBAIS y Campañas"
+    señales:
+      - "ebais"
+      - "ccss"
+      - "cruz roja"
+      - "campañas de salud"
+      - "hospital"
+      - "fumigación"

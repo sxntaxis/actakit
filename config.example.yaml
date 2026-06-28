@@ -1,0 +1,149 @@
+# =============================================================================
+# Pipeline de Actas Municipales — Configuración del cantón
+# =============================================================================
+# Copiá este archivo como config.yaml y reemplazá los valores para tu municipio.
+# Los paths pueden ser relativos a vault_root o absolutos (si arrancan con /).
+# Cada comunidad define su propia estructura de vault; estos son solo ejemplos.
+
+version: 1
+municipio: "Nombre del Cantón"
+
+# Raíz del vault de conocimiento (cada comunidad define su estructura)
+vault_root: "./mi-vault"
+
+# =============================================================================
+# Hilos temáticos
+# =============================================================================
+# Los Hilos son los ejes temáticos que organizan el conocimiento extraído
+# de las actas. Se organizan en bloques (carpetas) y cada bloque contiene
+# una lista de hilos (archivos .md que se generan automáticamente).
+
+hilos:
+  bloques:
+    - nombre: "Gobierno Local y Gobernanza"
+      hilos:
+        - "Concejo Municipal y Funcionamiento"
+        - "Proyectos de Ley e Incidencia Legislativa"
+        - "Transparencia, Datos, Tecnología y Comunicación"
+        - "Capacitación, Talento Humano y Jornadas"
+
+    - nombre: "Finanzas, Control y Activos"
+      hilos:
+        - "Presupuesto, Finanzas, Tarifas y Planificación"
+        - "Contratación, Activos y Mercado Municipal"
+        - "Auditoría y Control Interno"
+
+    - nombre: "Movilidad Servicios e Infraestructura"
+      hilos:
+        - "Agua Potable, AyA y ASADAS"
+        - "Movilidad, Red Vial y Transporte Público"
+        - "Infraestructura Comunal y Espacios Públicos"
+        - "Residuos Sólidos y Reciclaje"
+
+    - nombre: "Territorio, Ambiente y Riesgo"
+      hilos:
+        - "Ambiente, Conservación y Afectaciones"
+        - "Gestión del Riesgo, Emergencias y Aguas Pluviales"
+        - "Ordenamiento Territorial y Plan Regulador"
+        - "Vivienda, Asentamientos y Urbanizaciones"
+        - "Zona Costera y Regularización"
+
+    - nombre: "Seguridad Ciudadana"
+      hilos:
+        - "Seguridad Ciudadana, Policía Municipal y Convivencia"
+
+    - nombre: "Inclusión, Cuidados y Derechos"
+      hilos:
+        - "Accesibilidad y Discapacidad"
+        - "Cuidados, Niñez y Personas Adultas Mayores"
+        - "Mujeres y Política de Género"
+
+    - nombre: "Educación, Cultura, Deporte y Juventudes"
+      hilos:
+        - "Cultura, Identidad, Memoria y Patrimonio"
+        - "Deporte y Recreación"
+        - "Educación, Becas e Infraestructura Educativa"
+        - "Juventudes"
+
+    - nombre: "Salud y Protección Social"
+      hilos:
+        - "Salud Pública, CCSS, EBAIS y Campañas"
+        - "Personas en Situación de Calle y Adicciones"
+
+    - nombre: "Economía, Puerto y Turismo"
+      hilos:
+        - "Economía Local, Comercio, Turismo y Emprendimientos"
+        - "Puerto o Zona Económica Especial"
+
+  alias:
+    "Cultura, Religión y Eventos Especiales": "Cultura, Identidad, Memoria y Patrimonio"
+    "Salud y CCSS": "Salud Pública, CCSS, EBAIS y Campañas"
+
+# =============================================================================
+# Scraping
+# =============================================================================
+# Configuración del scraper de actas desde el sitio web municipal.
+# Si tu municipio no publica actas online, omití esta sección.
+
+scraping:
+  url_base: "https://municipalidad-ejemplo.go.cr"
+  headers:
+    User-Agent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"
+    Accept-Language: "es-CR,es;q=0.9"
+  rate_limit_seg: 1.0
+
+  # Cada sección del sitio que contiene actas (Concejo, Comisiones, etc.)
+  secciones:
+    concejo:
+      path: "/actas-concejo"
+      selector: "ul.fileTree"
+    comisiones:
+      path: "/actas-comisiones"
+      selector: "ul.fileTree"
+
+  output_dir: "actas/descargadas"
+
+# =============================================================================
+# Enrutamiento
+# =============================================================================
+# Ruta al archivo de enrutamiento para la skill procesar-acta.
+# Mapea palabras clave de las actas a los Hilos correspondientes.
+
+enrutamiento: "skills/procesar-acta/config/ejemplo/enrutamiento.yaml"
+
+# =============================================================================
+# Procesamiento de actas (integración)
+# =============================================================================
+# Directorios donde se leen y escriben los archivos.
+
+procesamiento:
+  actas_dir: "actas/procesadas"
+  hilos_dir: "hilos"
+  pendientes: "pendientes.md"
+
+# =============================================================================
+# Extracción - pdftotext
+# =============================================================================
+
+extraccion:
+  comando: 'pdftotext -layout "<pdf>" -'
+  texto_dir: "_texto_md"
+
+# =============================================================================
+# Lugares locales (generado por setup_municipio.py)
+# =============================================================================
+# Archivo JSON con nombres de lugares locales del cantón.
+
+lugares_local: ""
+
+# =============================================================================
+# Bootstrap de Hilos (automático)
+# =============================================================================
+
+bootstrap:
+  actas_dir: "actas/procesadas"
+  output_dir: "bootstrap"
+  clustering:
+    min_shared: 2
+    min_jaccard: 0.15
+  seed_enabled: true

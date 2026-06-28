@@ -1,0 +1,12 @@
+# Inbox de borradores de actas — EJEMPLO
+
+inbox_raiz: "inbox"
+# Carpeta raíz del inbox (relativa a vault_root). Cada corrida crea una subcarpeta con la etiqueta de lote.
+
+etiqueta_lote_default: "actas_<YYYY-MM-DD>"
+
+sufijos_revision: ["zen", "rev"]
+# Sufijos para distinguir corridas de revisión.
+
+convencion_nombres_borrador: "Acta_<N>_<YYYY-MM-DD>.md"
+# Ejemplo: Acta_156_2026-04-27.md

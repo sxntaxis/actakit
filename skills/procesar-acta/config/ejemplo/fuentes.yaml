@@ -1,0 +1,19 @@
+# Fuentes de actas — EJEMPLO
+# Rutas relativas a vault_root.
+
+fuente_canonica: "actas/descargadas"
+# Carpeta con PDFs originales del Concejo Municipal.
+
+extractos_md: "actas/descargadas/_texto_md"
+# Subcarpeta con extracciones .md derivadas.
+
+extractos_txt: "actas/descargadas/_texto_txt"
+# Subcarpeta con extracciones .txt.
+
+convencion_nombres_pdf: "Acta N° <N> - <tipo> - <DD> de <mes> de <YYYY>.pdf"
+# Ejemplo: Acta N° 156 - Ordinaria - 27 de abril del 2026.pdf
+
+convencion_nombres_md: "Acta_<N>_<YYYY-MM-DD>.md"
+# Ejemplo: Acta_156_2026-04-27.md
+
+comando_extraccion: 'pdftotext -layout "<pdf>" -'

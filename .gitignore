@@ -1,0 +1,102 @@
+# =============================================================================
+# actakit — .gitignore
+# =============================================================================
+
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+*.whl
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.pyenv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+.DS_Store
+Thumbs.db
+*.log
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# ── Config local ─────────────────────────────────────────────────────────────
+# NO commitear config.yaml — contiene datos específicos del cantón
+config.yaml
+*.local.yaml
+secrets.yaml
+
+# ── Actas y datos municipales ───────────────────────────────────────────────
+# PDFs y DOCXs originales — datos públicos pero pesados
+**/actas/**/*.pdf
+**/actas/**/*.docx
+**/actas/**/*.xlsx
+
+# Textos extraídos
+**/actas/**/_texto_md/
+**/actas/**/_texto_txt/
+**/_texto_md/
+
+# Backups de graduación
+**/actas/**/bak_graduacion/
+**/bak_graduacion/
+
+# Archivos de salida de scraping
+**/inventario_actas.csv
+**/actas/descargadas/
+
+# ── JSON auxiliares (datos intermedios del pipeline) ───────────────────────
+# Todos estos se regeneran en cada corrida
+Herramientas/
+herramientas/
+datos/
+_data/
+
+# Bootstrap output
+bootstrap/
+bootstrap_summary.json
+bootstrap_report.md
+
+# Propuestas de hilos
+_propuestas_hilos.json
+
+# Hilos generados (se regeneran de actas procesadas)
+hilos/
+
+# Inbox del skill (borradores en revisión)
+**/inbox/
+**/inbox_*/
+
+# Vault local (cada municipio define su propio vault)
+mi-vault/
+vault/
+*.vault/
+
+# ── Dependencias de sistema ──────────────────────────────────────────────────
+# poppler-utils se instala a nivel de sistema, no en el repo
+
+# ── Docs generados ───────────────────────────────────────────────────────────
+site/
+_build/
+*.bak
+
+# ── Git ───────────────────────────────────────────────────────────────────────
+# Mantener los archivos de arriba pero no el directorio .git
+.git/

@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  compile-check:
+    name: Syntax & compilation
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11', '3.12']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Syntax check all Python files
+        run: |
+          for f in scripts/*.py; do
+            python3 -m py_compile "$f" || exit 1
+          done
+          echo "All Python files compile successfully"
+
+      - name: Shell script syntax check
+        run: bash -n scripts/run_bootstrap.sh
+
+      - name: Python import check
+        run: |
+          python3 -c "from scripts.entity_index import extract_entities; print('entity_index import OK')"
+          python3 -c "from scripts.bootstrap_hilos import SEED_HILOS; print(f'SEED_HILOS: {len(SEED_HILOS)} hilos')"
+          python3 -c "from scripts.extract_tablero import spanish_date_to_iso; print(spanish_date_to_iso('27 de abril del 2026'))"
+
+      - name: Regex pattern sanity check
+        run: |
+          python3 -c "
+import re
+from scripts.entity_index import (
+    INSTITUTIONS, INSTITUTION_PATTERNS, LAW_PATTERNS,
+    PLACE_PATTERNS, ROLE_PATTERNS
+)
+# Verify no catastrophic backtracking patterns
+for pat, _ in LAW_PATTERNS:
+    re.compile(pat, re.IGNORECASE)
+for pat, _ in PLACE_PATTERNS:
+    re.compile(pat, re.IGNORECASE)
+for role in ROLE_PATTERNS:
+    re.compile(role, re.IGNORECASE)
+print('All regex patterns compile OK')
+"
+
+  shellcheck:
+    name: Shell script lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mvdan/shellcheck@v0.9.0
+        with:
+          args: scripts/*.sh
+
+  yaml-validate:
+    name: YAML syntax validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate config YAMLs
+        run: |
+          python3 -c "
+import yaml, sys
+files = ['config.example.yaml', 'skills/procesar-acta/config/ejemplo/enrutamiento.yaml']
+for f in files:
+    try:
+        with open(f) as fh:
+            yaml.safe_load(fh)
+        print(f'OK: {f}')
+    except Exception as e:
+        print(f'FAIL: {f} — {e}')
+        sys.exit(1)
+"
