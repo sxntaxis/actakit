@@ -32,6 +32,10 @@ fuente (PDF, OCR, extracto `.md`); el resto de la pipeline es genérico.
 2. Cada borrador cumple el [formato intermedio](../_formato-intermedio.md).
 3. Reporte de corrida.
 
+Los nuevos borradores usan `version_formato: 2` y el frontmatter definido en
+`../_formato-intermedio.md`. Las actas históricas sin frontmatter son formato
+legado y no se migran durante el procesamiento ordinario.
+
 ## Config
 
 Antes de ejecutarse, leer:
@@ -104,6 +108,8 @@ Para cada ítem enrutado, redactar según la plantilla narrativa:
 - **Cuerpo**: 2–5 párrafos, orden: contexto, qué ocurrió, quién intervino,
   qué preocupación apareció, qué dato se aportó, qué acuerdo se tomó.
 - **Cita canónica**: `> Fuente: Acta N° X, DD de mes del YYYY, ...`.
+- **Datos estructurados**: agregar `episodio_id`, `tipo: evidencia` y los
+  localizadores `archivo`, `articulo`, `item` y `pagina` en el frontmatter.
 
 #### 5.3 Anuncios sin acuerdo formal
 

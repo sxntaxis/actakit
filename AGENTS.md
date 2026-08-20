@@ -163,12 +163,16 @@ Backups automáticos antes de sobreescritura.
 El resultado es un borrador en el inbox que, tras revisión humana, se
 mueve al directorio de actas procesadas (`actas/procesadas/`).
 
-**Formato de salida:** Archivo Markdown por acta con:
+**Formato de salida:** Los borradores nuevos usan el frontmatter v2 de
+`skills/_formato-intermedio.md`. Las actas históricas sin frontmatter se
+mantienen como formato legado compatible. El cuerpo Markdown que consume el
+integrador usa:
 ```markdown
 # Acta N° 123 — Sesión Ordinaria — 27 de abril del 2026
 
 ## Episodios
-### 2026-04-27 — Título del episodio
+### → Hilo: `Movilidad, Red Vial y Transporte Público`
+#### 2026-04-27 — Título del episodio
 Contenido estructurado...
 > Fuente: Acta N° 123, ...
 
@@ -215,8 +219,10 @@ backup y reprocesar desde cero.
 python scripts/integrate_hilos.py --config config.yaml
 ```
 
-Lee todas las actas procesadas, extrae episodios y reconstruye archivos
-de Hilo en `hilos/`. Cada hilo es un archivo `.md` por bloque temático.
+Lee todas las actas procesadas y agrega únicamente episodios no presentes en
+los Hilos existentes. No borra resúmenes, contexto heredado, Readmes ni otros
+materiales curatoriales. `--rebuild --force-delete` es destructivo y debe
+usarse solo sobre salidas desechables.
 
 **Formato de hilo:**
 ```markdown
@@ -228,7 +234,7 @@ Contenido del episodio...
 ```
 
 **Seguridad:** No sigue symlinks. Usa `O_NOFOLLOW` en todas las
-operaciones de escritura.
+operaciones de escritura. Revisar siempre `--dry-run` antes de integrar.
 
 ---
 
@@ -268,13 +274,34 @@ El formato de las actas procesadas está especificado en
 `skills/_formato-intermedio.md`. Todo procesamiento debe producir
 output que cumpla este contrato.
 
-**Estructura básica:**
+**Estructura básica v2:**
 
 ```markdown
+---
+version_formato: 2
+fuente_tipo: actas
+fuente_id: Acta N° 123
+fecha_fuente: 2026-04-27
+estado: aprobado
+episodios:
+  - episodio_id: acta-123-art-iii-item-4-vialidad
+    fecha: 2026-04-27
+    titulo: Título del episodio
+    hilo_destino: Movilidad, Red Vial y Transporte Público
+    tipo: evidencia
+    cuerpo: Contenido estructurado...
+    cita: Acta N° 123, 27 de abril del 2026, Artículo III, ítem 4.
+    fuente:
+      archivo: 3 Fuentes/Municipalidad/Actas/concejo/acta_123.pdf
+      articulo: III
+      item: 4
+      pagina: null
+---
 # Acta N° {num} — {tipo sesión} — {fecha en español}
 
 ## Episodios
-### {YYYY-MM-DD} — {título del episodio}
+### → Hilo: `{Hilo canónico}`
+#### {YYYY-MM-DD} — {título del episodio}
 {contenido estructurado}
 > Fuente: Acta N° {num}, {fecha}, ...
 

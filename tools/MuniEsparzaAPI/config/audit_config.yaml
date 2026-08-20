@@ -1,0 +1,96 @@
+municipality: "Esparza, Puntarenas"
+portal_url: "https://datosabiertos.muniesparza.go.cr"
+api_base_url: "http://api.datosabiertos.muniesparza.go.cr/api/v2"
+referer: "https://datosabiertos.muniesparza.go.cr/developers/"
+
+rate_limit:
+  requests_per_second: 1
+  timeout_seconds: 45
+  max_retries: 4
+  retry_backoff_seconds: [2, 5, 10, 20]
+  sleep_on_429_seconds: 15
+
+catalog:
+  page_limit: 100
+  order: "last"
+  output_dir: "data/raw/catalog"
+
+# Formatos por defecto. ajson suele ser el más fácil de auditar.
+datastreams:
+  formats_default: ["ajson"]
+  formats_priority_categories:
+    # Category names are normalized (no trailing spaces) by junar_common.normalize_label().
+    Presupuesto: ["ajson", "csv", "xls"]
+    Contabilidad: ["ajson", "csv", "xls"]
+    Patentes: ["ajson", "csv"]
+    "Permisos de construcción": ["ajson", "csv", "xls"]
+    Clausuras: ["ajson", "csv"]
+    "Bienes Inmuebles": ["ajson", "csv"]
+    Visados: ["ajson", "csv"]
+    Mapas: ["ajson", "csv"]
+    "Recursos Humanos": ["ajson", "csv"]
+    Catastro: ["ajson", "csv"]
+  page_limit: 5000
+  max_pages_per_datastream: 200
+  output_dir: "data/raw/datastreams"
+  skip_existing: true
+
+endpoint_downloads:
+  enabled: true
+  output_dir: "data/raw/endpoints"
+  allowed_extensions: [".csv", ".xls", ".xlsx", ".json", ".zip", ".pdf", ".txt"]
+  skip_existing: true
+
+coverage_topics:
+  - presupuesto
+  - modificaciones_presupuestarias
+  - ejecucion_presupuestaria
+  - liquidacion_presupuestaria
+  - contabilidad
+  - patentes
+  - permisos_construccion
+  - clausuras
+  - bienes_inmuebles
+  - visados
+  - catastro_mapas
+  - demografia
+  - empleo
+  - educacion
+  - recursos_humanos
+  - plan_vial
+  - obras
+  - canon_puerto_caldera
+  - participacion_ciudadana
+  - asociaciones_adi
+  - asadas
+  - concejo_actas
+  - comisiones_municipales
+  - ambiente
+  - tivives_caldera
+
+keyword_map:
+  presupuesto: ["presupuesto", "presupuestaria", "ingresos", "egresos", "partida", "programa"]
+  modificaciones_presupuestarias: ["modificacion", "modificación", "modif", "presupuestaria"]
+  ejecucion_presupuestaria: ["ejecucion", "ejecución", "ejecutado", "avance financiero"]
+  liquidacion_presupuestaria: ["liquidacion", "liquidación", "cierre"]
+  contabilidad: ["contabilidad", "balance", "comprobacion", "comprobación", "estado financiero"]
+  patentes: ["patente", "patentes", "licencia comercial", "licencia"]
+  permisos_construccion: ["permiso", "construccion", "construcción", "obra menor", "obra mayor"]
+  clausuras: ["clausura", "clausuras", "cierre"]
+  bienes_inmuebles: ["bienes inmuebles", "inmueble", "finca", "propiedad"]
+  visados: ["visado", "visados"]
+  catastro_mapas: ["catastro", "mapa", "mapas", "cartografia", "cartografía", "zona homogénea", "zonas homogeneas"]
+  demografia: ["demografia", "demografía", "poblacion", "población", "habitantes"]
+  empleo: ["empleo", "economico", "económico", "ocupada", "trabajo"]
+  educacion: ["educacion", "educación", "escuela", "colegio", "matricula", "matrícula"]
+  recursos_humanos: ["recursos humanos", "funcionarios", "planilla", "salarios"]
+  plan_vial: ["plan vial", "vial", "camino", "caminos", "calles", "mantenimiento vial"]
+  obras: ["obra", "obras", "infraestructura", "cuneta", "asfalto", "cordón", "caño"]
+  canon_puerto_caldera: ["canon", "caldera", "puerto", "incop", "ley 8461", "tonelada"]
+  participacion_ciudadana: ["participacion", "participación", "ciudadana", "organizaciones", "audiencia", "consulta"]
+  asociaciones_adi: ["asociacion", "asociación", "adi", "desarrollo comunal", "dinadeco"]
+  asadas: ["asada", "asadas", "acueducto", "agua"]
+  concejo_actas: ["concejo", "acta", "actas", "sesion", "sesión", "acuerdo"]
+  comisiones_municipales: ["comision", "comisión", "comisiones", "comad", "ambiente", "mujer"]
+  ambiente: ["ambiente", "ambiental", "residuos", "reciclaje", "riesgo", "emergencia"]
+  tivives_caldera: ["tivives", "caldera", "mata de limon", "mata de limón", "zona protectora", "manglar"]

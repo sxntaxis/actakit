@@ -62,6 +62,7 @@ EPISODE_REGEX = re.compile(r'^#### (\d{4}-\d{2}-\d{2}) — (.+)$')
 SECTION_REGEX = re.compile(r'^## ')
 FUENTE_REGEX = re.compile(r'^> Fuente:')
 EMPTY_LINE_REGEX = re.compile(r'^\s*$')
+HILO_EPISODE_REGEX = re.compile(r'^### (\d{4}-\d{2}-\d{2}) — (.+)$', re.MULTILINE)
 
 # Directories that MUST NOT be used as HILOS_DIR (safety guard)
 PROTECTED_DIRS = {Path('/'), Path.home()}
@@ -82,6 +83,10 @@ def parse_acta(filepath):
     filename = os.path.basename(filepath)
     with open(filepath, 'r', encoding='utf-8') as f:
         lines = f.readlines()
+
+    metadata = parse_frontmatter(lines)
+    if isinstance(metadata.get('episodios'), list):
+        return parse_structured_episodes(metadata, filename)
 
     in_episodes = False
     episodes = []
@@ -164,6 +169,50 @@ def parse_acta(filepath):
     return episodes
 
 
+def parse_frontmatter(lines):
+    """Return YAML frontmatter when present; legacy actas have none."""
+    if not lines or lines[0].strip() != '---':
+        return {}
+    try:
+        end = next(i for i, line in enumerate(lines[1:], 1) if line.strip() == '---')
+    except StopIteration:
+        return {}
+    try:
+        import yaml
+        return yaml.safe_load(''.join(lines[1:end])) or {}
+    except Exception as exc:
+        print(f"WARNING: frontmatter invalido, se usa Markdown: {exc}")
+        return {}
+
+
+def parse_structured_episodes(metadata, filename):
+    """Read v2 structured episodes while preserving the legacy output shape."""
+    episodes = []
+    for item in metadata['episodios']:
+        if not isinstance(item, dict):
+            continue
+        hilo = item.get('hilo_destino')
+        date = str(item.get('fecha', ''))
+        title = str(item.get('titulo', '')).strip()
+        if not hilo or not re.fullmatch(r'\d{4}-\d{2}-\d{2}', date) or not title:
+            print(f"WARNING: episodio v2 invalido en {filename}, se omite")
+            continue
+        source = str(item.get('cita', '')).strip()
+        if source and not source.startswith('> Fuente:'):
+            source = f"> Fuente: {source}"
+        episodes.append({
+            'hilo': str(hilo).strip(),
+            'date': date,
+            'title': title,
+            'body': str(item.get('cuerpo', '')).strip(),
+            'fuente': source,
+            'source_file': filename,
+            'episode_id': str(item.get('episodio_id', '')).strip(),
+            'tipo': str(item.get('tipo', 'evidencia')).strip(),
+        })
+    return episodes
+
+
 def format_episode(ep):
     """Format an episode for inclusion in a Hilo file."""
     parts = [f"### {ep['date']} — {ep['title']}", ""]
@@ -176,6 +225,41 @@ def format_episode(ep):
     if result:
         result += '\n\n'
     return result
+
+
+def episode_key(ep):
+    """Stable key for avoiding duplicate integration without rewriting Hilos."""
+    if ep.get('episode_id'):
+        return f"id:{ep['episode_id']}"
+    source = re.sub(r'\s+', ' ', ep.get('fuente', '')).strip()
+    return f"legacy:{ep['date']}\x1f{ep['title']}\x1f{source}"
+
+
+def existing_episode_keys(filepath):
+    """Read existing Hilo headings and citations without altering its prose."""
+    if not filepath.exists():
+        return set()
+    text = filepath.read_text(encoding='utf-8')
+    keys = set()
+    matches = list(HILO_EPISODE_REGEX.finditer(text))
+    for index, match in enumerate(matches):
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(text)
+        block = text[match.start():end]
+        source_match = re.search(r'^> Fuente:.*$', block, re.MULTILINE)
+        source = re.sub(r'\s+', ' ', source_match.group(0)).strip() if source_match else ''
+        keys.add(f"legacy:{match.group(1)}\x1f{match.group(2).strip()}\x1f{source}")
+    return keys
+
+
+def append_episodes(filepath, episodes):
+    """Append approved new episodes without changing existing Hilo content."""
+    if filepath.is_symlink():
+        raise OSError(f"Refusing to write to symlink: {filepath}")
+    addition = ''.join(format_episode(ep) for ep in episodes)
+    prefix = "\n" if filepath.exists() and filepath.stat().st_size else ""
+    fd = os.open(filepath, os.O_CREAT | os.O_WRONLY | os.O_APPEND | os.O_NOFOLLOW, 0o644)
+    with os.fdopen(fd, 'w', encoding='utf-8') as f:
+        f.write(prefix + addition)
 
 
 def resolve_hilo(name, alias_map=None):
@@ -234,6 +318,9 @@ def main():
     parser.add_argument("--hilos-config", default=None, help="Archivo JSON/YAML con definición de hilos")
     parser.add_argument("--pendientes", default=None, help="Archivo de pendientes (opcional)")
     parser.add_argument("--dry-run", action="store_true", help="Solo listar, no modificar archivos")
+    parser.add_argument("--since", default=None, help="Integrar episodios desde YYYY-MM-DD")
+    parser.add_argument("--rebuild", action="store_true", help="Reconstruir Hilos desde cero (destructivo)")
+    parser.add_argument("--force-delete", action="store_true", help="Confirmar eliminación requerida por --rebuild")
     args = parser.parse_args()
 
     dry_run = args.dry_run
@@ -249,6 +336,7 @@ def main():
         PENDIENTES = vault_root / proc.get('pendientes', 'pendientes.md')
         OFFICIAL_HILOS = build_official_hilos(config)
         HILO_ALIAS = build_alias_map(config)
+        default_since = proc.get('integrar_desde')
     else:
         ACTAS_DIR = Path(args.actas_dir) if args.actas_dir else Path("actas/procesadas")
         HILOS_DIR = Path(args.hilos_dir) if args.hilos_dir else Path("hilos")
@@ -261,6 +349,11 @@ def main():
         else:
             print("Error: se necesita --config o --hilos-config")
             sys.exit(1)
+        default_since = None
+
+    integration_since = args.since or default_since
+    if integration_since and not re.fullmatch(r'\d{4}-\d{2}-\d{2}', integration_since):
+        parser.error("--since debe usar el formato YYYY-MM-DD")
 
     unknown_hilos = set()
     unknown_hilo_episodes = defaultdict(list)
@@ -268,6 +361,7 @@ def main():
     alias_used = defaultdict(list)
     total_episodes = 0
     total_skipped = 0
+    total_filtered = 0
     processed_actas = set()
 
     if not ACTAS_DIR.exists():
@@ -289,6 +383,9 @@ def main():
 
         for ep in episodes:
             total_episodes += 1
+            if integration_since and ep['date'] < integration_since:
+                total_filtered += 1
+                continue
             raw_name = ep['hilo']
             official_name = resolve_hilo(raw_name, HILO_ALIAS)
 
@@ -322,8 +419,13 @@ def main():
             },
         })
 
-    # Clean existing hilo files (safe delete)
-    if HILOS_DIR.exists():
+    if args.force_delete and not args.rebuild:
+        parser.error("--force-delete requiere --rebuild")
+    if args.rebuild and not args.force_delete:
+        parser.error("--rebuild requiere --force-delete; la integración normal es aditiva")
+
+    # Rebuild is reserved for disposable output directories. Canonical use is additive.
+    if args.rebuild and HILOS_DIR.exists():
         if not is_safe_hilos_dir(HILOS_DIR):
             print(f"Error: HILOS_DIR {HILOS_DIR.resolve()} es un directorio protegido. Abortando.")
             sys.exit(1)
@@ -333,7 +435,9 @@ def main():
         else:
             print(f"Eliminados {removed} archivos .md existentes en HILOS_DIR")
 
-    files_created = []
+    files_modified = []
+    episodes_added = 0
+    episodes_unchanged = 0
     propuestas_nuevas = list(unknown_hilos)
 
     for hilo_name, block in OFFICIAL_HILOS.items():
@@ -345,38 +449,31 @@ def main():
         block_dir.mkdir(parents=True, exist_ok=True)
 
         filepath = block_dir / f"{hilo_name}.md"
-        if not dry_run:
-            if filepath.is_symlink():
-                print(f"  ! Saltando escritura a symlink: {filepath}")
-            else:
-                fd = os.open(filepath, os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW, 0o644)
-                try:
-                    with os.fdopen(fd, 'w', encoding='utf-8') as f:
-                        for ep in eps:
-                            f.write(format_episode(ep))
-                except FileExistsError:
-                    print(f"  ! Archivo ya existe, se omite: {filepath}")
-                except Exception:
-                    try:
-                        os.unlink(filepath)
-                    except OSError:
-                        pass
-                    raise
-
-        files_created.append(str(filepath))
-        ep_count = len(eps)
+        known = set() if args.rebuild else existing_episode_keys(filepath)
+        pending = [ep for ep in eps if episode_key(ep) not in known]
+        episodes_unchanged += len(eps) - len(pending)
+        if pending:
+            if not dry_run:
+                block_dir.mkdir(parents=True, exist_ok=True)
+                append_episodes(filepath, pending)
+            files_modified.append(str(filepath))
+            episodes_added += len(pending)
         alias_info = ""
         if hilo_name in alias_used:
             alias_info = f" (aliases: {', '.join(set(alias_used[hilo_name]))})"
-        print(f"{'[dry-run] ' if dry_run else ''}Created: {filepath} ({ep_count} episodes{alias_info})")
+        action = "would update" if dry_run else "updated"
+        print(f"{'[dry-run] ' if dry_run else ''}{action}: {filepath} ({len(pending)} new, {len(eps) - len(pending)} existing{alias_info})")
 
     coverage_pct = (total_episodes - total_skipped) / max(total_episodes, 1) * 100
 
     print("\n" + "=" * 60)
     print("## Reporte de integración — integrate_hilos")
     print(f"- Actas procesadas: {len(processed_actas)} ({total_episodes} episodios, {total_skipped} omitidos)")
+    if integration_since:
+        print(f"- Episodios anteriores a {integration_since}: {total_filtered} sin integrar")
     print(f"- Cobertura: {coverage_pct:.1f}%")
-    print(f"- Archivos modificados: {len(files_created)}")
+    print(f"- Archivos modificados: {len(files_modified)}")
+    print(f"- Episodios agregados: {episodes_added}; ya presentes: {episodes_unchanged}")
     if propuestas_nuevas:
         print(f"- Propuestas de Hilo nuevo: {len(propuestas_nuevas)}")
         for h in propuestas_nuevas:

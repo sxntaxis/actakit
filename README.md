@@ -53,6 +53,15 @@ locales y archivos JSON/YAML de configuración.
 
 ## Arquitectura
 
+> The current file pipeline is stable for existing work. The proposed durable
+> civic-record architecture and implementation gates are in
+> [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md),
+> [`docs/ROADMAP.md`](docs/ROADMAP.md), and [`docs/STATUS.md`](docs/STATUS.md).
+> The full proposed 1.0 contracts, implementation plan, and distribution gates
+> are in [`docs/CONTRACTS.md`](docs/CONTRACTS.md),
+> [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md), and
+> [`docs/RELEASE_1_0.md`](docs/RELEASE_1_0.md).
+
 ```
 ┌──────────────┐   ┌───────────────┐   ┌─────────────────┐
 │  Scrapeo      │──→│  Extracción    │──→│  Procesamiento   │

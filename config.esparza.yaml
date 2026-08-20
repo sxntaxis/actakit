@@ -1,0 +1,98 @@
+version: 1
+municipio: "Esparza"
+
+# Plaza vault is the only canonical content source.
+vault_root: "/mnt/Ginebra/Plaza/vault"
+
+hilos:
+  bloques:
+    - nombre: "Economia, Puerto y Turismo"
+      hilos:
+        - "Economía Local, Comercio, Turismo y Emprendimientos"
+        - "Puerto Caldera, Logística y Desarrollo Costero"
+    - nombre: "Educacion, Cultura, Deporte y Juventudes"
+      hilos:
+        - "Cultura, Identidad, Memoria y Patrimonio"
+        - "Deporte y Recreación"
+        - "Educación, Becas e Infraestructura Educativa"
+        - "Juventudes y CCPJE"
+    - nombre: "Finanzas, Control y Activos"
+      hilos:
+        - "Auditoría y Control Interno"
+        - "Contratación, Activos y Mercado Municipal"
+        - "Presupuesto, Finanzas, Tarifas y Planificación"
+    - nombre: "Gobierno Local y Gobernanza"
+      hilos:
+        - "Anuncios"
+        - "Concejo Municipal y Funcionamiento"
+        - "Proyectos de Ley e Incidencia Legislativa"
+        - "Transparencia, Datos, Tecnología y Comunicación"
+    - nombre: "Inclusion, Cuidados y Derechos"
+      hilos:
+        - "Accesibilidad y Discapacidad"
+        - "Cuidados, Niñez y Personas Adultas Mayores"
+        - "Mujeres y Política de Género"
+    - nombre: "Movilidad Servicios e Infraestructura"
+      hilos:
+        - "Agua Potable, AyA y ASADAS"
+        - "Infraestructura Comunal y Espacios Públicos"
+        - "Movilidad, Red Vial y Transporte Público"
+        - "Residuos Sólidos y Reciclaje"
+    - nombre: "Salud y Proteccion Social"
+      hilos:
+        - "Personas en Situación de Calle y Adicciones"
+        - "Salud Pública, CCSS, EBAIS y Campañas"
+    - nombre: "Seguridad Ciudadana, Policia Municipal y Convivencia"
+      hilos:
+        - "Seguridad Ciudadana, Policía Municipal y Convivencia"
+    - nombre: "Territorio, Ambiente y Riesgo"
+      hilos:
+        - "Ambiente, Conservación y Afectaciones"
+        - "Gestión del Riesgo, Emergencias y Aguas Pluviales"
+        - "Ordenamiento Territorial y Plan Regulador"
+        - "Vivienda, Asentamientos y Urbanizaciones"
+        - "Zona Litoral, ZMT, Tivives y Regularización"
+
+  # Labels found in historical processed actas. These preserve the original
+  # documents while routing their episodes to the current canonical taxonomy.
+  alias:
+    "Territorio, Ambiente y Riesgo/Ambiente, Conservación y Afectaciones": "Ambiente, Conservación y Afectaciones"
+    "Infraestructura Comunal y Espacios Publicos": "Infraestructura Comunal y Espacios Públicos"
+    "Finanzas, Control y Activos/Presupuesto, Finanzas, Tarifas y Planificación": "Presupuesto, Finanzas, Tarifas y Planificación"
+    "Territorio, Ambiente y Riesgo/Gestión del Riesgo, Emergencias y Aguas Pluviales": "Gestión del Riesgo, Emergencias y Aguas Pluviales"
+    "Economia, Puerto y Turismo/Puerto Caldera, Logística y Desarrollo Costero": "Puerto Caldera, Logística y Desarrollo Costero"
+    "Personas en Situacion de Calle y Adicciones": "Personas en Situación de Calle y Adicciones"
+    "Gobierno Local y Gobernanza/Concejo Municipal y Funcionamiento": "Concejo Municipal y Funcionamiento"
+    "Salud y Proteccion Social/Salud Pública, CCSS, EBAIS y Campañas": "Salud Pública, CCSS, EBAIS y Campañas"
+    "Deporte y Recreacion": "Deporte y Recreación"
+    "Cultura, Religión y Eventos Especiales": "Cultura, Identidad, Memoria y Patrimonio"
+    "Educacion, Cultura, Deporte y Juventudes/Deporte y Recreación": "Deporte y Recreación"
+    "Educacion, Cultura, Deporte y Juventudes/Cultura, Identidad, Memoria y Patrimonio": "Cultura, Identidad, Memoria y Patrimonio"
+    "Finanzas, Control y Activos/Contratación, Activos y Mercado Municipal": "Contratación, Activos y Mercado Municipal"
+    "Movilidad Servicios e Infraestructura/Infraestructura Comunal y Espacios Públicos": "Infraestructura Comunal y Espacios Públicos"
+    "Educacion, Cultura, Deporte y Juventudes/Educación, Becas e Infraestructura Educativa": "Educación, Becas e Infraestructura Educativa"
+    "Movilidad Servicios e Infraestructura/Residuos Sólidos y Reciclaje": "Residuos Sólidos y Reciclaje"
+    "Salud y Proteccion Social/Personas en Situación de Calle y Adicciones": "Personas en Situación de Calle y Adicciones"
+    "Territorio, Ambiente y Riesgo/Ordenamiento Territorial y Plan Regulador": "Ordenamiento Territorial y Plan Regulador"
+    "Finanzas, Control y Activos/Auditoría y Control Interno": "Auditoría y Control Interno"
+    "Seguridad Ciudadana, Policia Municipal y Convivencia/Seguridad Ciudadana, Policía Municipal y Convivencia": "Seguridad Ciudadana, Policía Municipal y Convivencia"
+    "Territorio, Ambiente y Riesgo/Zona Litoral, ZMT, Tivives y Regularización": "Zona Litoral, ZMT, Tivives y Regularización"
+    "Movilidad Servicios e Infraestructura/Movilidad, Red Vial y Transporte Público": "Movilidad, Red Vial y Transporte Público"
+    "Inclusion, Cuidados y Derechos/Accesibilidad y Discapacidad": "Accesibilidad y Discapacidad"
+    "Salud y CCSS": "Salud Pública, CCSS, EBAIS y Campañas"
+    "Gobierno Local y Gobernanza/Proyectos de Ley e Incidencia Legislativa": "Proyectos de Ley e Incidencia Legislativa"
+
+enrutamiento: "/mnt/Ginebra/Plaza/vault/5 Archivo/skill attempt/procesar-acta/_config/enrutamiento.yaml"
+
+procesamiento:
+  actas_dir: "3 Fuentes/Municipalidad/Actas/procesadas"
+  hilos_dir: "2 Base cantonal/Hilos"
+  pendientes: "1 Operaciones/pendientes.md"
+  # Historical Hilos are curated. Only integrate actas after the Acta 161 baseline.
+  integrar_desde: "2026-05-19"
+
+extraccion:
+  comando: 'pdftotext -layout "<pdf>" -'
+  texto_dir: "3 Fuentes/Municipalidad/Actas/concejo/_texto_md"
+
+lugares_local: ""

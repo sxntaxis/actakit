@@ -1,6 +1,6 @@
 # Formato intermedio
 
-Este es el **contrato** entre las skills de extracción (`procesar-*`)
+Este es el **contrato v2** entre las skills de extracción (`procesar-*`)
 y la skill de integración (`tejer-hilo`). Toda skill `procesar-*` produce
 un archivo que cumple este formato; `tejer-hilo` lo consume sin negociar.
 
@@ -13,6 +13,7 @@ El formato combina:
 
 ```markdown
 ---
+version_formato: 2
 fuente_tipo: actas | prensa | redes | actas_institucionales | oficio | ...
 fuente_id: <identificador canónico>
 fecha_fuente: YYYY-MM-DD
@@ -22,11 +23,18 @@ hilos_destino:
   - <Hilo canónico 1>
   - <Hilo canónico 2>
 episodios:
-  - titulo: <texto>
+  - episodio_id: <fuente-id>-<locator>-<slug>
+    titulo: <texto>
     fecha: YYYY-MM-DD
     hilo_destino: <Hilo canónico>
+    tipo: evidencia | inferencia
     cuerpo: <markdown>
     cita: <texto canónico>
+    fuente:
+      archivo: <ruta local o URL canónica>
+      articulo: <número o null>
+      item: <número o null>
+      pagina: <número o null>
   - ...
 tablero_anuncios:
   - cita: <texto>
@@ -70,6 +78,10 @@ notas_extraccion:
 
 ## Campos del frontmatter
 
+### `version_formato`
+Usar `2` para nuevos borradores. Los archivos Markdown históricos sin
+frontmatter se aceptan como formato legado v1 y no deben migrarse en masa.
+
 ### `fuente_tipo`
 Tipo de fuente. Valores: `actas`, `actas_institucionales`, `prensa`,
 `redes`, `oficio`, `hallazgo`, `otro`.
@@ -91,6 +103,9 @@ Lista de Hilos canónicos a los que apunta el borrador.
 
 ### `episodios`
 Lista estructurada con `titulo`, `fecha`, `hilo_destino`, `cuerpo`, `cita`.
+Los nuevos episodios incluyen `episodio_id`, `tipo` y el objeto `fuente` para
+que la cita pública tenga un localizador verificable. `tipo` es `evidencia` por
+defecto; usar `inferencia` solo cuando la conclusión se declare como tal.
 
 ### `tablero_anuncios`
 Lista de anuncios materiales sin acuerdo formal.
